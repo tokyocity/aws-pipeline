@@ -35,26 +35,26 @@ export class PipelineStack extends cdk.Stack {
       stageName: "Source",
       actions: [
         new GitHubSourceAction({
-          owner: "Gtofig",
+          owner: "tokyocity",
           repo: "aws-pipeline",
-          branch: "master",
+          branch: "develop",
           actionName: "Pipeline_Source",
           oauthToken: SecretValue.secretsManager("github-token"),
           output: cdkSourceOutput,
         }),
-        new GitHubSourceAction({
-          owner: "Gtofig",
-          repo: "express-lambda",
-          branch: "master",
-          actionName: "Service_Source",
-          oauthToken: SecretValue.secretsManager("github-token"),
-          output: serviceSourceOutput,
-        }),
+        // new GitHubSourceAction({
+        //   owner: "tokyocity",
+        //   repo: "express-lambda",
+        //   branch: "develop",
+        //   actionName: "Service_Source",
+        //   oauthToken: SecretValue.secretsManager("github-token"),
+        //   output: serviceSourceOutput,
+        // }),
       ],
     });
 
     this.cdkBuildOutput = new Artifact("CdkBuildOutput");
-    this.serviceBuildOutput = new Artifact("ServiceBuildOutput");
+    // this.serviceBuildOutput = new Artifact("ServiceBuildOutput");
 
     this.pipeline.addStage({
       stageName: "Build",
@@ -72,72 +72,72 @@ export class PipelineStack extends cdk.Stack {
             ),
           }),
         }),
-        new CodeBuildAction({
-          actionName: "Service_Build",
-          input: serviceSourceOutput,
-          outputs: [this.serviceBuildOutput],
-          project: new PipelineProject(this, "ServiceBuildProject", {
-            environment: {
-              buildImage: LinuxBuildImage.STANDARD_5_0,
-            },
-            buildSpec: BuildSpec.fromSourceFilename(
-              "build-specs/service-build-spec.yml"
-            ),
-          }),
-        }),
+        // new CodeBuildAction({
+        //   actionName: "Service_Build",
+        //   input: serviceSourceOutput,
+        //   outputs: [this.serviceBuildOutput],
+        //   project: new PipelineProject(this, "ServiceBuildProject", {
+        //     environment: {
+        //       buildImage: LinuxBuildImage.STANDARD_5_0,
+        //     },
+        //     buildSpec: BuildSpec.fromSourceFilename(
+        //       "build-specs/service-build-spec.yml"
+        //     ),
+        //   }),
+        // }),
       ],
     });
 
-    this.pipeline.addStage({
-      stageName: "Pipeline_Update",
-      actions: [
-        new CloudFormationCreateUpdateStackAction({
-          actionName: "Pipeline_Update",
-          stackName: "PipelineStack",
-          templatePath: this.cdkBuildOutput.atPath(
-            "PipelineStack.template.json"
-          ),
-          adminPermissions: true,
-        }),
-      ],
-    });
+    // this.pipeline.addStage({
+    //   stageName: "Pipeline_Update",
+    //   actions: [
+    //     new CloudFormationCreateUpdateStackAction({
+    //       actionName: "Pipeline_Update",
+    //       stackName: "PipelineStack",
+    //       templatePath: this.cdkBuildOutput.atPath(
+    //         "PipelineStack.template.json"
+    //       ),
+    //       adminPermissions: true,
+    //     }),
+    //   ],
+    // });
   }
 
-  public addServiceStage(
-    serviceStack: ServiceStack,
-    stageName: string
-  ): IStage {
-    return this.pipeline.addStage({
-      stageName: stageName,
-      actions: [
-        new CloudFormationCreateUpdateStackAction({
-          actionName: "Service_Update",
-          stackName: serviceStack.stackName,
-          templatePath: this.cdkBuildOutput.atPath(
-            `${serviceStack.stackName}.template.json`
-          ),
-          adminPermissions: true,
-          parameterOverrides: {
-            ...serviceStack.serviceCode.assign(
-              this.serviceBuildOutput.s3Location
-            ),
-          },
-          extraInputs: [this.serviceBuildOutput],
-        }),
-      ],
-    });
-  }
+  // public addServiceStage(
+  //   serviceStack: ServiceStack,
+  //   stageName: string
+  // ): IStage {
+  //   return this.pipeline.addStage({
+  //     stageName: stageName,
+  //     actions: [
+  //       new CloudFormationCreateUpdateStackAction({
+  //         actionName: "Service_Update",
+  //         stackName: serviceStack.stackName,
+  //         templatePath: this.cdkBuildOutput.atPath(
+  //           `${serviceStack.stackName}.template.json`
+  //         ),
+  //         adminPermissions: true,
+  //         parameterOverrides: {
+  //           ...serviceStack.serviceCode.assign(
+  //             this.serviceBuildOutput.s3Location
+  //           ),
+  //         },
+  //         extraInputs: [this.serviceBuildOutput],
+  //       }),
+  //     ],
+  //   });
+  // }
 
-  public addBillingStackToStage(billingStack: BillingStack, stage: IStage) {
-    stage.addAction(
-      new CloudFormationCreateUpdateStackAction({
-        actionName: "Billing_Update",
-        stackName: billingStack.stackName,
-        templatePath: this.cdkBuildOutput.atPath(
-          `${billingStack.stackName}.template.json`
-        ),
-        adminPermissions: true,
-      })
-    );
-  }
+  // public addBillingStackToStage(billingStack: BillingStack, stage: IStage) {
+  //   stage.addAction(
+  //     new CloudFormationCreateUpdateStackAction({
+  //       actionName: "Billing_Update",
+  //       stackName: billingStack.stackName,
+  //       templatePath: this.cdkBuildOutput.atPath(
+  //         `${billingStack.stackName}.template.json`
+  //       ),
+  //       adminPermissions: true,
+  //     })
+  //   );
+  // }
 }
