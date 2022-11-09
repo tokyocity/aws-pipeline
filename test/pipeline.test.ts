@@ -14,14 +14,14 @@ import { ServiceStack } from "../lib/service-stack";
 import { PipelineStack } from "../lib/pipeline-stack";
 import { BillingStack } from "../lib/billing-stack";
 
-// test("Pipeline Stack", () => {
-//   const app = new cdk.App();
-//   // WHEN
-//   const stack = new Pipeline.PipelineStack(app, "MyTestStack");
-//   // THEN
+test("Pipeline Stack", () => {
+  const app = new cdk.App();
+  // WHEN
+  const stack = new Pipeline.PipelineStack(app, "MyTestStack");
+  // THEN
 
-//   expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-// });
+  expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+});
 
 // test("Adding service stage", () => {
 //   // GIVEN
