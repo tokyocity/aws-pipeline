@@ -14,14 +14,26 @@ import { ServiceStack } from "../lib/service-stack";
 import { PipelineStack } from "../lib/pipeline-stack";
 import { BillingStack } from "../lib/billing-stack";
 
-test("Pipeline Stack", () => {
-  const app = new cdk.App();
-  // WHEN
-  const stack = new Pipeline.PipelineStack(app, "MyTestStack");
-  // THEN
+test('SQS Queue Created', () => {
+  //   const app = new cdk.App();
+  //     // WHEN
+  //   const stack = new KiriiLinechatCdk.KiriiLinechatCdkStack(app, 'MyTestStack');
+  //     // THEN
+  //   const template = Template.fromStack(stack);
+  
+  //   template.hasResourceProperties('AWS::SQS::Queue', {
+  //     VisibilityTimeout: 300
+  //   });
+  });
 
-  expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-});
+// test("Pipeline Stack", () => {
+//   const app = new cdk.App();
+//   // WHEN
+//   const stack = new Pipeline.PipelineStack(app, "MyTestStack");
+//   // THEN
+
+//   expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+// });
 
 // test("Adding service stage", () => {
 //   // GIVEN
